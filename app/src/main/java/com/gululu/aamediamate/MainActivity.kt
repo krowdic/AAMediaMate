@@ -70,6 +70,7 @@ import com.gululu.aamediamate.billing.BillingManager
 import com.gululu.aamediamate.models.MediaInfo
 import com.gululu.aamediamate.ui.BackupRestoreScreen
 import com.gululu.aamediamate.ui.BridgedAppsScreen
+import com.gululu.aamediamate.ui.DiagnosticLogsScreen
 import com.gululu.aamediamate.ui.DonationScreen
 import com.gululu.aamediamate.ui.LyricsCleanupRulesScreen
 import com.gululu.aamediamate.ui.LyricsEditorScreen
@@ -155,6 +156,7 @@ fun MediaBridgeApp(billingManager: BillingManager? = null) {
     var showDisplaySettings by remember { mutableStateOf(false) }
     var showDonationScreen by remember { mutableStateOf(false) }
     var showBackupRestore by remember { mutableStateOf(false) }
+    var showDiagnosticLogs by remember { mutableStateOf(false) }
     var selectedLyricsKey by remember { mutableStateOf<String?>(null) }
     var manualSearchLyricsKey by remember { mutableStateOf<String?>(null) }
     var currentMediaInfo by remember { mutableStateOf<MediaInfo?>(null) }
@@ -198,11 +200,13 @@ fun MediaBridgeApp(billingManager: BillingManager? = null) {
         showDisplaySettings -> com.gululu.aamediamate.ui.DisplaySettingsScreen { showDisplaySettings = false }
         showDonationScreen -> billingManager?.let { DonationScreen(billingManager = it, onBack = { showDonationScreen = false }) }
         showBackupRestore -> BackupRestoreScreen { showBackupRestore = false }
+        showDiagnosticLogs -> DiagnosticLogsScreen { showDiagnosticLogs = false }
         showSettings -> SettingsScreen(
             onBack = { showSettings = false },
             onNavigateToLyricsSettings = { showLyricsSettings = true },
             onNavigateToBridgedApps = { showBridgedApps = true },
-            onNavigateToDisplaySettings = { showDisplaySettings = true }
+            onNavigateToDisplaySettings = { showDisplaySettings = true },
+            onNavigateToDiagnosticLogs = { showDiagnosticLogs = true }
         )
         showLyricsManager -> LyricsManagerScreen(
             onBack = { showLyricsManager = false },

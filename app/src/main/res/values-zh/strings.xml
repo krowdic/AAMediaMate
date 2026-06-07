@@ -9,6 +9,8 @@
     <string name="show">查看</string>
     <string name="hide">隐藏</string>
     <string name="back">返回</string>
+    <string name="refresh">刷新</string>
+    <string name="clear">清空</string>
     <string name="simplify_chinese">繁体转简体</string>
     <string name="ignore_auto_supported_apps">忽略原生 Android Auto 播放器</string>
     <string name="lyrics_manager">歌词管理器</string>
@@ -59,6 +61,19 @@
     <string name="backup_restart_required_title">需要重启</string>
     <string name="backup_restart_required_message">配置已还原。请重启应用以应用所有更改。</string>
     <string name="backup_restart_app">重启应用</string>
+
+    <!-- Diagnostics -->
+    <string name="diagnostics_title">诊断日志</string>
+    <string name="diagnostics_privacy_note">仅保存最近的媒体和歌词诊断事件。不包含歌词正文、API Key、授权 Token 或完整响应正文。</string>
+    <string name="diagnostics_debug_enable">详细 30 分钟</string>
+    <string name="diagnostics_debug_disable">停止详细日志</string>
+    <string name="diagnostics_copy_report">复制 issue 报告</string>
+    <string name="diagnostics_report_copied">诊断报告已复制</string>
+    <string name="diagnostics_open_github">打开 GitHub</string>
+    <string name="diagnostics_levels">级别</string>
+    <string name="diagnostics_modules">模块</string>
+    <string name="diagnostics_event_count">显示 %1$d / %2$d 条事件</string>
+    <string name="diagnostics_no_details">没有详情。</string>
     
     <!-- Display Customization -->
     <string name="display_settings_title">界面个性化</string>

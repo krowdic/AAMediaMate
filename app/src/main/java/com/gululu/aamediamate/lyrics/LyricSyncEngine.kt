@@ -27,10 +27,10 @@ object LyricSyncEngine {
                 val delayMs = (line.timeSec * 1000 - (System.currentTimeMillis() - startTime))
                 
                 if (delayMs > 0) {
-                    Log.d("MediaBridge", "🎤 Waiting ${delayMs}ms for line: ${line.text}")
+                    Log.d("MediaBridge", "🎤 Waiting ${delayMs}ms for lyric line index $i")
                     delay(delayMs.toLong())
                 } else {
-                    Log.d("MediaBridge", "🎤 Playing catch-up for line: ${line.text}")
+                    Log.d("MediaBridge", "🎤 Playing catch-up for lyric line index $i")
                 }
                 
                 onLineChanged(line.text)

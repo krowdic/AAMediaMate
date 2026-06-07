@@ -13,6 +13,8 @@ import android.media.session.MediaController
 import androidx.core.graphics.withTranslation
 import androidx.core.graphics.scale
 import androidx.core.graphics.createBitmap
+import com.gululu.aamediamate.diagnostics.DiagnosticLogger
+import com.gululu.aamediamate.diagnostics.DiagnosticModule
 
 object MediaInformationRetriever {
     private val iconMap = mutableMapOf<String, Bitmap?>()
@@ -51,10 +53,28 @@ object MediaInformationRetriever {
             )
 
             Log.d("MediaBridge", "🔄 Updating media info：$mediaInfo")
+            DiagnosticLogger.info(
+                context,
+                DiagnosticModule.MEDIA,
+                "Media info refreshed",
+                mapOf(
+                    "package" to mediaInfo.appPackageName,
+                    "app" to mediaInfo.appName,
+                    "title" to mediaInfo.title,
+                    "artist" to mediaInfo.artist,
+                    "playing" to mediaInfo.isPlaying,
+                    "durationMs" to mediaInfo.duration
+                )
+            )
             return mediaInfo
         } catch (e: Exception) {
             Log.e("MediaBridge", "⚠️ Updating media info failed")
-            e.printStackTrace()
+            DiagnosticLogger.error(
+                context,
+                DiagnosticModule.MEDIA,
+                "Media info refresh failed",
+                throwable = e
+            )
             return null
         }
     }
@@ -170,6 +190,13 @@ object MediaInformationRetriever {
                 drawableToBitmap(drawable)
             } catch (e: Exception) {
                 Log.w("MediaBridge", "⚠️ Failed to get app icon for $packageName: ${e.message}")
+                DiagnosticLogger.warn(
+                    context,
+                    DiagnosticModule.MEDIA,
+                    "Failed to load app icon",
+                    mapOf("package" to packageName),
+                    e
+                )
                 null
             }
             // Cache the result (even if null) to avoid repeated attempts

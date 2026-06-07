@@ -5,6 +5,8 @@ import android.util.Log
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import androidx.media.MediaBrowserServiceCompat
+import com.gululu.aamediamate.diagnostics.DiagnosticLogger
+import com.gululu.aamediamate.diagnostics.DiagnosticModule
 
 class MediaBridgeService : MediaBrowserServiceCompat() {
     
@@ -22,6 +24,7 @@ class MediaBridgeService : MediaBrowserServiceCompat() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+        DiagnosticLogger.info(this, DiagnosticModule.MEDIA, "Media browser service started")
 
         MediaBridgeSessionManager.init(this)
 
@@ -102,6 +105,12 @@ class MediaBridgeService : MediaBrowserServiceCompat() {
         }
 
         Log.d("MediaBridge", "📋 Loaded ${items.size} media items")
+        DiagnosticLogger.debug(
+            this,
+            DiagnosticModule.MEDIA,
+            "Media browser children loaded",
+            mapOf("parentId" to parentId, "itemCount" to items.size)
+        )
         result.sendResult(items)
     }
 }

@@ -3,6 +3,8 @@ package com.gululu.aamediamate
 import android.content.Context
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
+import com.gululu.aamediamate.diagnostics.DiagnosticLogger
+import com.gululu.aamediamate.diagnostics.DiagnosticModule
 import com.gululu.aamediamate.models.MediaInfo
 
 object MediaBridgeSessionManager {
@@ -32,6 +34,7 @@ object MediaBridgeSessionManager {
 
         mediaStateUpdater?.clear(mediaSession!!)
         Log.d("MediaBridge", "✅ MediaSession initialized.")
+        DiagnosticLogger.info(appContext, DiagnosticModule.MEDIA, "MediaSession initialized")
     }
 
     fun updateFromMediaInfo(info: MediaInfo?) {
@@ -42,6 +45,12 @@ object MediaBridgeSessionManager {
         if (info == null || !Global.packageAllowed(ctx, info.appPackageName)) {
             if (info != null) {
                 Log.d("MediaBridge", "🚫 Ignoring disallowed package: ${info.appPackageName}")
+                DiagnosticLogger.info(
+                    ctx,
+                    DiagnosticModule.MEDIA,
+                    "Ignoring disallowed media package",
+                    mapOf("package" to info.appPackageName)
+                )
             }
             mediaStateUpdater?.clear(session)
             lyricDisplayManager?.stop()
@@ -52,6 +61,18 @@ object MediaBridgeSessionManager {
 
         // Track this app as bridged
         SettingsManager.addOrUpdateBridgedApp(ctx, info.appPackageName, info.appName)
+        DiagnosticLogger.info(
+            ctx,
+            DiagnosticModule.MEDIA,
+            "Media session updated",
+            mapOf(
+                "package" to info.appPackageName,
+                "app" to info.appName,
+                "title" to info.title,
+                "artist" to info.artist,
+                "playing" to info.isPlaying
+            )
+        )
 
         // Restore original metadata before showing lyrics
         mediaStateUpdater?.update(session, info)
