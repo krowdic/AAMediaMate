@@ -2,6 +2,7 @@ package com.gululu.aamediamate
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import com.gululu.aamediamate.models.MediaInfo
@@ -136,5 +137,31 @@ class LyricDisplayManagerTest {
 
         // Verify Artist is just "Artist Name" (no trailing dash)
         assertEquals("Artist Name", metadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST))
+    }
+
+    @Test
+    fun `updateLyricLine writes artwork to art and album art metadata keys`() {
+        val albumArt = Bitmap.createBitmap(8, 8, Bitmap.Config.ARGB_8888)
+        val mediaInfo = MediaInfo(
+            title = "Song Title",
+            artist = "Artist Name",
+            album = "Album Name",
+            appName = "MusicApp",
+            appPackageName = "com.music.app",
+            duration = 1000L,
+            isPlaying = true,
+            position = 0L,
+            albumArt = albumArt,
+            appIcon = null
+        )
+
+        invokeUpdateLyricLine(mediaInfo, "Singing lyrics...")
+
+        val slot = slot<MediaMetadataCompat>()
+        verify { mediaSession.setMetadata(capture(slot)) }
+
+        val metadata = slot.captured
+        assertEquals(albumArt, metadata.getBitmap(MediaMetadataCompat.METADATA_KEY_ART))
+        assertEquals(albumArt, metadata.getBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART))
     }
 }
