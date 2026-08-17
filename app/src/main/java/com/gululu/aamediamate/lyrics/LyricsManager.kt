@@ -3,6 +3,8 @@ package com.gululu.aamediamate.lyrics
 import android.content.Context
 import com.github.houbb.opencc4j.util.ZhConverterUtil
 import com.gululu.aamediamate.SettingsManager
+import com.gululu.aamediamate.diagnostics.DiagnosticLogger
+import com.gululu.aamediamate.diagnostics.DiagnosticModule
 import com.gululu.aamediamate.lyrics.providers.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -17,17 +19,57 @@ object LyricsManager {
 
         // Get enabled providers in order of priority
         val enabledProviders = SettingsManager.getEnabledProvidersInOrder(context)
+        DiagnosticLogger.info(
+            context,
+            DiagnosticModule.LYRICS,
+            "Lyric provider search started",
+            mapOf(
+                "title" to title,
+                "artist" to artist,
+                "cleanedTitle" to cleanedTitle,
+                "cleanedArtist" to cleanedArtist,
+                "providers" to enabledProviders.joinToString(",") { it.id }
+            )
+        )
         
         for (providerConfig in enabledProviders) {
             try {
                 val lrc = providerConfig.provider.getLyricsLrc(context, cleanedTitle, cleanedArtist, duration)
                 if (!lrc.isNullOrBlank()) {
+                    DiagnosticLogger.info(
+                        context,
+                        DiagnosticModule.LYRICS,
+                        "Lyric provider returned lyrics",
+                        mapOf(
+                            "provider" to providerConfig.id,
+                            "bytes" to lrc.toByteArray().size,
+                            "lineCount" to lrc.lineSequence().count()
+                        )
+                    )
                     return@withContext lrc
                 }
+                DiagnosticLogger.info(
+                    context,
+                    DiagnosticModule.LYRICS,
+                    "Lyric provider returned no lyrics",
+                    mapOf("provider" to providerConfig.id)
+                )
             } catch (e: Exception) {
-                e.printStackTrace()
+                DiagnosticLogger.error(
+                    context,
+                    DiagnosticModule.LYRICS,
+                    "Lyric provider failed",
+                    mapOf("provider" to providerConfig.id),
+                    e
+                )
             }
         }
+        DiagnosticLogger.warn(
+            context,
+            DiagnosticModule.LYRICS,
+            "All lyric providers returned no lyrics",
+            mapOf("title" to cleanedTitle, "artist" to cleanedArtist)
+        )
         return@withContext null
     }
 

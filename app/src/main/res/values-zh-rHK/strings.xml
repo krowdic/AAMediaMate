@@ -10,6 +10,8 @@
     <string name="show">顯示</string>
     <string name="hide">隱藏</string>
     <string name="back">返回</string>
+    <string name="refresh">重新整理</string>
+    <string name="clear">清空</string>
     <string name="simplify_chinese">繁體轉簡體</string>
     <string name="ignore_auto_supported_apps">忽略原生 Android Auto 播放器</string>
     <string name="lyrics_manager">歌詞管理器</string>
@@ -60,6 +62,19 @@
     <string name="backup_restart_required_title">需要重新啟動</string>
     <string name="backup_restart_required_message">設定已還原。請重新啟動應用程式以套用所有變更。</string>
     <string name="backup_restart_app">重新啟動應用程式</string>
+
+    <!-- Diagnostics -->
+    <string name="diagnostics_title">診斷日誌</string>
+    <string name="diagnostics_privacy_note">僅保存最近的媒體和歌詞診斷事件。不包含歌詞正文、API Key、授權 Token 或完整回應內容。</string>
+    <string name="diagnostics_debug_enable">詳細 30 分鐘</string>
+    <string name="diagnostics_debug_disable">停止詳細日誌</string>
+    <string name="diagnostics_copy_report">複製 issue 報告</string>
+    <string name="diagnostics_report_copied">診斷報告已複製</string>
+    <string name="diagnostics_open_github">開啟 GitHub</string>
+    <string name="diagnostics_levels">級別</string>
+    <string name="diagnostics_modules">模組</string>
+    <string name="diagnostics_event_count">顯示 %1$d / %2$d 條事件</string>
+    <string name="diagnostics_no_details">沒有詳情。</string>
     
     <!-- Display Customization -->
     <string name="display_settings_title">介面個人化</string>
