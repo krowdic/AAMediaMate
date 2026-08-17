@@ -65,7 +65,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import com.gululu.aamediamate.billing.BillingManager
 import com.gululu.aamediamate.models.MediaInfo
 import com.gululu.aamediamate.ui.BackupRestoreScreen
@@ -104,7 +103,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        billingManager = BillingManager(this, lifecycleScope)
+        billingManager = BillingManager(this)
         billingManager.startConnection()
 
         setContent {

@@ -7,12 +7,7 @@ import com.android.billingclient.api.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-
-class BillingManager(private val context: Context, private val scope: CoroutineScope) {
+class BillingManager(private val context: Context) {
 
     private val _purchases = MutableStateFlow<List<Purchase>>(emptyList())
     val purchases = _purchases.asStateFlow()
@@ -32,7 +27,12 @@ class BillingManager(private val context: Context, private val scope: CoroutineS
 
     private var billingClient: BillingClient = BillingClient.newBuilder(context)
         .setListener(purchasesUpdatedListener)
-        .enablePendingPurchases()
+        .enablePendingPurchases(
+            PendingPurchasesParams.newBuilder()
+                .enableOneTimeProducts()
+                .build()
+        )
+        .enableAutoServiceReconnection()
         .build()
 
     private val _billingState = MutableStateFlow<BillingUiState>(BillingUiState.Loading)
@@ -78,27 +78,31 @@ class BillingManager(private val context: Context, private val scope: CoroutineS
     }
 
     private fun queryProducts() {
-        scope.launch(Dispatchers.IO) {
-            val productList = listOf(
-                            QueryProductDetailsParams.Product.newBuilder()
-                                .setProductId("donate_tier_1")
-                                .setProductType(BillingClient.ProductType.INAPP)
-                                .build(),
-                            QueryProductDetailsParams.Product.newBuilder()
-                                .setProductId("donate_tier_2")
-                                .setProductType(BillingClient.ProductType.INAPP)
-                                .build()
-                            )
-            val params = QueryProductDetailsParams.newBuilder()
-                .setProductList(productList)
+        val productList = listOf(
+            QueryProductDetailsParams.Product.newBuilder()
+                .setProductId("donate_tier_1")
+                .setProductType(BillingClient.ProductType.INAPP)
+                .build(),
+            QueryProductDetailsParams.Product.newBuilder()
+                .setProductId("donate_tier_2")
+                .setProductType(BillingClient.ProductType.INAPP)
                 .build()
+        )
+        val params = QueryProductDetailsParams.newBuilder()
+            .setProductList(productList)
+            .build()
 
-            val productDetailsResult = billingClient.queryProductDetails(params)
-            val billingResult = productDetailsResult.billingResult
+        billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsResult ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                val products = productDetailsResult.productDetailsList ?: emptyList()
+                val products = productDetailsResult.productDetailsList
                 _billingState.value = BillingUiState.Success(products)
                 Log.d("BillingManager", "Product query successful. Found ${products.size} products.")
+                if (productDetailsResult.unfetchedProductList.isNotEmpty()) {
+                    Log.w(
+                        "BillingManager",
+                        "Unfetched products: ${productDetailsResult.unfetchedProductList}"
+                    )
+                }
             } else {
                 _billingState.value = BillingUiState.Error("Query failed: ${billingResult.responseCode} ${billingResult.debugMessage}")
                 Log.e("BillingManager", "Product query failed with response code: ${billingResult.responseCode} and message: ${billingResult.debugMessage}")
