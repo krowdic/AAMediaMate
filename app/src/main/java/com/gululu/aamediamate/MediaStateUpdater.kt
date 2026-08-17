@@ -16,8 +16,6 @@ class MediaStateUpdater(private val context: Context) {
     }
 
     private fun updateMetadata(mediaSession: MediaSessionCompat, info: MediaInfo) {
-        val swapEnabled = SettingsManager.isAppSwapRewindFastForward(context, info.appPackageName)
-
         val artist = info.artist.takeIf { it.isNotBlank() }
         val album = info.album.takeIf { it.isNotBlank() }
 
@@ -39,6 +37,7 @@ class MediaStateUpdater(private val context: Context) {
         metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, "From ${info.appName}")
 
         info.albumArt?.let {
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, it)
             metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, it)
         }
 

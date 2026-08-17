@@ -27,11 +27,7 @@ object MediaInformationRetriever {
             val state = controller.playbackState ?: return null
 
             val appIcon = getAppIconBitmap(context, controller.packageName)
-            var albumArt = metadata.getBitmap(MediaMetadata.METADATA_KEY_ART)
-            if (albumArt == null)
-            {
-                albumArt = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
-            }
+            var albumArt = getArtwork(metadata)
             if (appIcon != null && albumArt != null && SettingsManager.getCombineAppIconAndAlbumArt(context))
             {
                 albumArt = composeAlbumArtWithAppIconFixed(albumArt, appIcon)
@@ -66,7 +62,7 @@ object MediaInformationRetriever {
         val state = controller.playbackState ?: return null
 
         val appIcon = getAppIconBitmap(context, controller.packageName)
-        var albumArt = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
+        var albumArt = getArtwork(metadata)
 
         if (appIcon != null && albumArt != null && SettingsManager.getCombineAppIconAndAlbumArt(context)) {
             albumArt = composeAlbumArtWithAppIconFixed(albumArt, appIcon)
@@ -85,6 +81,10 @@ object MediaInformationRetriever {
             albumArt = albumArt
         )
     }
+
+    private fun getArtwork(metadata: MediaMetadata): Bitmap? =
+        metadata.getBitmap(MediaMetadata.METADATA_KEY_ART)
+            ?: metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
 
     private fun composeAlbumArtWithAppIconFixed(
         albumArt: Bitmap,

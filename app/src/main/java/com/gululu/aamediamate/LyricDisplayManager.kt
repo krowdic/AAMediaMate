@@ -149,6 +149,7 @@ class LyricDisplayManager(private val context: Context) {
         }
 
         originalInfo.albumArt?.let {
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, it)
             metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, it)
         }
 
