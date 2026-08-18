@@ -11,6 +11,7 @@ import com.gululu.aamediamate.lyrics.LyricCache
 import com.gululu.aamediamate.lyrics.LyricSyncEngine
 import com.gululu.aamediamate.lyrics.LyricsRepository
 import com.gululu.aamediamate.models.MediaInfo
+import com.gululu.aamediamate.utils.ChineseConverter
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.sync.Mutex
@@ -152,17 +153,31 @@ class LyricDisplayManager(private val context: Context) {
         metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, "From ${originalInfo.appName}")
 
         val showAlbumName = SettingsManager.getShowAlbumName(context)
+        
+        // 根據用戶設置決定是否進行繁簡轉換
+        val conversionMode = ChineseConverter.getConversionModeByLocale(context)
 
         if (lyricLine.isNotBlank()) {
+            // 轉換歌詞行
+            val convertedLyricLine = ChineseConverter.convert(lyricLine, conversionMode)
             // When a lyric is displayed, use the lyric as the title
-            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, lyricLine)
+            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, convertedLyricLine)
 
             // Consolidate song title, artist, and album into the ARTIST field
             val songInfoParts = mutableListOf<String>()
-            originalInfo.title.takeIf { it.isNotBlank() }?.let { songInfoParts.add(it) }
-            originalInfo.artist.takeIf { it.isNotBlank() }?.let { songInfoParts.add(it) }
+            // 轉換標題
+            originalInfo.title.takeIf { it.isNotBlank() }?.let { 
+                songInfoParts.add(ChineseConverter.convert(it, conversionMode)) 
+            }
+            // 轉換藝術家
+            originalInfo.artist.takeIf { it.isNotBlank() }?.let { 
+                songInfoParts.add(ChineseConverter.convert(it, conversionMode)) 
+            }
             if (showAlbumName) {
-                originalInfo.album.takeIf { it.isNotBlank() }?.let { songInfoParts.add(it) }
+                // 轉換專輯名稱
+                originalInfo.album.takeIf { it.isNotBlank() }?.let { 
+                    songInfoParts.add(ChineseConverter.convert(it, conversionMode)) 
+                }
             }
             
             val songInfo = songInfoParts.joinToString(" - ")
@@ -170,10 +185,17 @@ class LyricDisplayManager(private val context: Context) {
 
         } else {
             // When no lyric is displayed, restore the original media info formatted correctly
-            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, originalInfo.title)
+            // 轉換標題
+            val convertedTitle = ChineseConverter.convert(originalInfo.title, conversionMode)
+            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, convertedTitle)
 
-            val artist = originalInfo.artist.takeIf { it.isNotBlank() }
-            val album = originalInfo.album.takeIf { it.isNotBlank() }
+            // 轉換藝術家和專輯
+            val artist = originalInfo.artist.takeIf { it.isNotBlank() }?.let { 
+                ChineseConverter.convert(it, conversionMode) 
+            }
+            val album = originalInfo.album.takeIf { it.isNotBlank() }?.let { 
+                ChineseConverter.convert(it, conversionMode) 
+            }
             
             val artistText = if (showAlbumName) {
                 listOfNotNull(artist, album).joinToString(" - ")
